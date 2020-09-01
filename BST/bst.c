@@ -2,13 +2,30 @@
 #include <stdlib.h>
 #include "bst.h"
 
+typedef struct QueueBSTNode {
+  struct BSTNode* node;
+  struct QueueBSTNode* next;
+} QueueBSTNode;
+
+/**
+ * Helper function for creating a new queue node 
+ */
+QueueBSTNode* createQueueNode(BSTNode* bstNode) {
+
+  QueueBSTNode* newNode = (QueueBSTNode*) malloc(sizeof(QueueBSTNode));
+  newNode->node = bstNode;
+  newNode->next = NULL;
+
+  return newNode;
+}
+
 /**
  * Iterative Binary Search algorithm for a Binary Search Tree, starting at
  * the root BSTNode given. If the value is found within the BST, then a
  * pointer to that BSTNode with that value is returned. If the value is not 
  * found within the BST, then NULL is simply returned.
  */
-BSTNode* search(BSTNode* root, const int value) {
+BSTNode* searchBST(BSTNode* root, const int value) {
 
   BSTNode* curr = root;
   while (curr != NULL && curr->value != value) {
@@ -28,7 +45,7 @@ BSTNode* search(BSTNode* root, const int value) {
  * Otherwise, a new node with the given value is directly inserted into 
  * the BST and the parent node of the new node is returned.
  */
-BSTNode* insert(BSTNode* root, const int value) {
+BSTNode* insertNode(BSTNode* root, const int value) {
 
   BSTNode* parent = NULL;
   BSTNode* curr = root;
@@ -58,27 +75,79 @@ BSTNode* insert(BSTNode* root, const int value) {
 }
 
 /**
+ * Iteratively removes and frees all the memory of the nodes in a BST based 
+ * on the root given. This uses a Level-Order Traversal (or Breadth-First Search)
+ * to achieve this task iteratively.
+ */
+void clearBST(BSTNode* root) {
+
+  QueueBSTNode *front, *rear;
+  front = createQueueNode(root);
+  rear = front;
+
+  while (front != NULL) {
+  
+    if (front->node->left != NULL) {
+      rear->next = createQueueNode(front->node->left);
+      rear = rear->next;
+    }
+
+    if (front->node->right != NULL) {
+      rear->next = createQueueNode(front->node->right);
+      rear = rear->next;
+    }
+
+    QueueBSTNode* nextQueueNode = front->next;    
+    free(front->node);
+    free(front);
+    front = nextQueueNode;
+
+  }
+
+}
+
+/**
  * Iterative In-Order Traversal for a Binary Search Tree, printing the 
  * nodes in ascending order. This function returns the size of the overall 
  * Binary Search Tree, which is the current number of nodes within the tree
  */
 int traverseInOrder(BSTNode* root) {
- // TODO
+  // TODO
+  return -1;
+}
+
+
+// TODO: ABSTRACT INTO UNIT TESTS LATER
+// TEST FUNCTIONALITY
+void testInsert() {
+  BSTNode* root = insertNode(NULL, 10);
+  printf("%s\n", root != NULL ? "Root NOT NULL" : "Root = NULL");
+  printf("%d\n", root != NULL ? root->value : -1);
+  printf("root->left = %s\n", root->left != NULL ? "NOT NULL" : "NULL");
+  printf("root->right = %s\n", root->right != NULL ? "NOT NULL" : "NULL");
+
+  printf("\nInserting 5 into tree!\n");
+  insertNode(root, 5);
+ 
+  printf("root = %d\n", root->value); 
+  printf("root->left = %d\n", root->left->value);  
+  printf("root->right = %s\n", root->right != NULL ? "NOT NULL" : "NULL");
+
+  printf("\nInserting 14 into tree!\n");
+  insertNode(root, 14);
+  printf("root->right = %d\n", root->right->value);
+
+  clearBST(root);
+  root = NULL;
+
 }
 
 int main() {
   printf("Hello, World!\n");
 
-  BSTNode* root = (BSTNode*) calloc(1, sizeof(BSTNode));
-  printf("%d, %s, %s\n", root->value, !root->left ? "NULL" : "NOT NULL", !root->right ? "NULL" : "NOT NULL");
-  root->value = 5;
-  root->left = (BSTNode*) calloc(1, sizeof(BSTNode));
-  root->left->value = 3;
+  printf("BSTNode size = %lu\n", sizeof(BSTNode));
+  printf("QueueNode size = %lu\n", sizeof(QueueBSTNode));
+  testInsert();
 
-  printf("%s\n", search(root, 5) ? "Root Found" : "Root Not Found");
-  printf("%s\n", search(root, 3) ? "3 Found" : "3 Not Found");
-
-  free(root->left);
-  free(root);
   return 0;
 }

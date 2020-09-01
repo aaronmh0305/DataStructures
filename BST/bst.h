@@ -8,8 +8,10 @@ typedef struct BSTNode {
   struct BSTNode* right;
 } BSTNode;
 
-BSTNode* search(BSTNode* root, const int value);  // search function
-BSTNode* insert(BSTNode* root, const int value);  // insert function
-int traverseInOrder(BSTNode* root);               // in-order BST traversal
+BSTNode* search(BSTNode* root, const int value);      // search function
+BSTNode* insertNode(BSTNode* root, const int value);  // insert function
+BSTNode* removeNode(BSTNode* root, const int value);  // remove function
+void clearBST(BSTNode* root);                         // frees resources
+int traverseInOrder(BSTNode* root);                   // in-order BST traversal
 
 #endif  // BST_H
