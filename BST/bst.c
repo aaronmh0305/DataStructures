@@ -112,8 +112,39 @@ void clearBST(BSTNode* root) {
  * Binary Search Tree, which is the current number of nodes within the tree
  */
 int traverseInOrder(BSTNode* root) {
-  // TODO
-  return -1;
+  
+  BSTNode* curr = root;
+  BSTNode* pred = NULL;
+  int count = 0;
+
+  while (curr != NULL) {
+
+    if (curr->left == NULL) {
+      printf("%d, ", curr->value);
+      count++;
+      curr = curr->right;
+    } else {
+
+      // find in-order predecessor      
+      pred = curr->left;
+      while (pred->right != NULL && pred->right != curr) {
+        pred = pred->right;
+      }
+
+      if (pred->right == NULL) {
+        pred->right = curr;
+        curr = curr->left;
+      } else {
+        pred->right = NULL;
+        printf("%d, ", curr->value);
+        count++;
+        curr = curr->right;
+      }
+    }
+  }
+
+  printf("\n");
+  return count;
 }
 
 
@@ -137,17 +168,15 @@ void testInsert() {
   insertNode(root, 14);
   printf("root->right = %d\n", root->right->value);
 
+  int size = traverseInOrder(root);
+  printf("COUNT: %d\n", size);
+
   clearBST(root);
   root = NULL;
-
 }
 
 int main() {
-  printf("Hello, World!\n");
 
-  printf("BSTNode size = %lu\n", sizeof(BSTNode));
-  printf("QueueNode size = %lu\n", sizeof(QueueBSTNode));
   testInsert();
-
   return 0;
 }
