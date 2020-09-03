@@ -13,6 +13,11 @@ typedef struct QueueBSTNode {
 QueueBSTNode* createQueueNode(BSTNode* bstNode) {
 
   QueueBSTNode* newNode = (QueueBSTNode*) malloc(sizeof(QueueBSTNode));
+  if (newNode == NULL) {
+    fprintf(stderr, "Out of Heap Memory for Free Queue. Exiting...\n");
+    exit(-1);
+  }
+
   newNode->node = bstNode;
   newNode->next = NULL;
 
@@ -61,6 +66,10 @@ BSTNode* insertNode(BSTNode* root, const int value) {
   }
 
   curr = (BSTNode*) calloc(1, sizeof(BSTNode));
+  if (curr == NULL) {
+    fprintf(stderr, "Out of Heap Memory for BSTNode allocation. Exiting...\n");
+    exit(-1);
+  }
   curr->value = value;
   
   if (parent == NULL) {
@@ -72,6 +81,72 @@ BSTNode* insertNode(BSTNode* root, const int value) {
   }
 
   return parent;
+}
+
+/**
+ * Iteratively removes a single BSTNode with a given value from the BST if it exists, starting 
+ * from the root node given. This function returns -1 if the BSTNode with the given value is not 
+ * found within the current BST, or 0 if the BSTNode with the value was found and successfully removed.
+ */
+BSTNode* removeNode(BSTNode* root, const int value) {
+  
+  BSTNode* curr = root;
+  BSTNode* parent = NULL;
+
+  // search for the node to remove and keep track of the parent
+  while (curr != NULL && curr->value != value) {
+    parent = curr;
+    curr = ((value > curr->value) ? curr->right : curr->left);
+  }
+
+  // if node doesn't exist, then don't do anything. simply return root.
+  if (curr == NULL) {
+    fprintf(stderr, "BSTNode with value = %d not found in the BST\n", value);
+    return root;
+  }
+
+  // if the node to delete has at most one child
+  if (curr->left == NULL || curr->right == NULL) {
+
+    BSTNode* temp = ((curr->left == NULL) ? curr->right : curr->left);
+   
+    // if the root node is to be deleted, return its child if it had one (or NULL if not)
+    // REMEMBER to reassign the root node to this return value!
+    if (parent == NULL) {
+      free(curr);
+      return temp;
+    }    
+
+    if (curr == parent->left) {
+      parent->left = temp;
+    } else {
+      parent->right = temp;
+    }
+
+    free(curr);
+    
+  } else {
+    // otherwise, the node to delete has both children
+    BSTNode* succParent = NULL;
+    BSTNode* succ = curr->right;
+    
+    // find the in-order successor
+    while (succ->left != NULL) {
+      succParent = succ;
+      succ = succ->left;
+    }
+
+    if (succParent == NULL) {
+      curr->right = succ->right;
+    } else {
+      succParent->left = succ->right;
+    }
+
+    curr->value = succ->value;
+    free(succ);
+  }
+ 
+  return root;
 }
 
 /**
@@ -171,8 +246,16 @@ void testInsert() {
   int size = traverseInOrder(root);
   printf("COUNT: %d\n", size);
 
-  clearBST(root);
-  root = NULL;
+  removeNode(root, 5);
+  removeNode(root, 14);
+  //root = removeNode(root, 5);
+  size = traverseInOrder(root);
+  printf("COUNT: %d\n", size);
+ 
+  //root = NULL;
+
+//  clearBST(root);
+//  root = NULL;
 }
 
 int main() {
