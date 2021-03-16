@@ -4,12 +4,12 @@
 CC = gcc
 CFLAGS = -Wall -Werror
 
-make: bst
+make: clean bst
 	$(CC) -o bst bst.o
 
 bst:
 	$(CC) $(CFLAGS) -c bst.c
 
 clean:
-	-rm bst.o
-	-rm bst
+	rm -f bst.o
+	rm -f bst
